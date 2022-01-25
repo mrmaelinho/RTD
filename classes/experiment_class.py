@@ -23,6 +23,16 @@ class Experiment():
         self.data['absorbance'] = self.raw_data.absorbance\
                     - min(self.raw_data.absorbance)
 
+    def hydro_geom(self):
+        """
+        Returns essential hydrodynamic and geometrical parameters.
+        """
+        self.speed = int(self.flowrate) * 1.6e-11 / (500e-6*500e-6)
+        self.aspect_ratio = int(self.stages) * 0.5 / 500e-6
+        self.Re = 1000 * 500e-6 * self.speed / 1e-3
+        self.Sc = 1e-6 / 1e-8
+        self.Pe = self.Re * self.Sc
+
     def plot_absorbance(self):
         """
         Plots absorbance against time.
@@ -37,6 +47,7 @@ class Experiment():
         ax.grid()
         ax.set_title('%s stages (%d µL) @%s µL/min'%(self.stages, int(self.stages)*125,self.flowrate))
         fig.savefig(self.file_path[:-4]+'-raw.jpg',transparent=True)
+        plt.close(fig)
 
     def RTD_bestfit(self):
         """
@@ -60,9 +71,11 @@ class Experiment():
                                                           self.tau_opt,\
                                                           self.Bo_opt,\
                                                           self.scale_opt)
+        self.Dax = self.speed * int(self.stages) * 0.5 / self.Bo_opt
+
     def plot_bestfit(self):
         """
-        Plots the results of the RTD best fit.
+        Plots the results of the RTD best fit on reduced axes.
         """
         fig, ax = plt.subplots()
         ax.set_xlabel('$\Theta$') #Reduced time absciss
@@ -86,6 +99,7 @@ class Experiment():
                      self.Bo_opt,\
                      self.Bo_std))
         fig.savefig(self.file_path[:-4]+'-dts.jpg',transparent=True)
+        plt.close(fig)
 
 
 
