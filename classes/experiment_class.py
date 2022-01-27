@@ -27,10 +27,11 @@ class Experiment():
         """
         Returns essential hydrodynamic and geometrical parameters.
         """
+        self.length = int(self.stages) * 0.5
         self.speed = int(self.flowrate) * 1.6e-11 / (500e-6*500e-6)
         self.aspect_ratio = int(self.stages) * 0.5 / 500e-6
         self.Re = 1000 * 500e-6 * self.speed / 1e-3
-        self.Sc = 1e-6 / 1e-8
+        self.Sc = 1e-6 / 6e-10
         self.Pe = self.Re * self.Sc
 
     def plot_absorbance(self):
@@ -71,7 +72,7 @@ class Experiment():
                                                           self.tau_opt,\
                                                           self.Bo_opt,\
                                                           self.scale_opt)
-        self.Dax = self.speed * int(self.stages) * 0.5 / self.Bo_opt
+        self.Dax = self.speed * self.length / self.Bo_opt
 
     def plot_bestfit(self):
         """

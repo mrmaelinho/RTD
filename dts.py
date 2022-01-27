@@ -53,10 +53,20 @@ for file_path in file_paths:
                                              experiment.Bo_opt,\
                                              experiment.Bo_std,\
                                              experiment.Dax]
-    plt.scatter(experiment.speed,\
-                experiment.Bo_opt,\
-                color = colours[int(experiment.stages)],\
-                label = "%s stages"%experiment.stages)
+    plt.plot(experiment.speed,\
+             experiment.Dax,\
+             'o',\
+             markersize = 4,\
+             color = colours[int(experiment.stages)],\
+             label = "%s stages"%experiment.stages,\
+             )
+    if np.log10(experiment.Pe) < np.log10(experiment.length/500e-6)+1:
+        plt.plot(experiment.speed,\
+                 experiment.Dax,\
+                 'o',\
+                 markersize = 10,\
+                 color = colours[int(experiment.stages)],\
+                 mfc='none')
 
     #Make a directory for this experiment.
     os.mkdir(file_path[:-4])
@@ -69,10 +79,10 @@ experiment_parameters.to_csv(dir+'\\recap.csv', sep='\t')
 
 ##
 #Taylor dispersion prediction
-# _speed = np.linspace(0,0.1,100)
-# _Taylor_Dax = _speed*_speed*25e-8/(30*1e-8)
-# plt.plot(_speed,_Taylor_Dax, label = 'Taylor theoretical trend')
-#Display labels and grid
+_speed = np.linspace(0,0.1,100)
+_Taylor_Dax = _speed*_speed*25e-8/(30*1e-8)
+plt.plot(_speed,_Taylor_Dax, label = 'Taylor theoretical trend')
+# Display labels and grid
 plt.xlabel('speed (m/s)')
 plt.ylabel('Bo (m2/s)')
 plt.grid()
@@ -83,3 +93,17 @@ plt.legend(reversed(by_label.values()),\
            reversed(by_label.keys()))
 #Display
 plt.savefig(dir+'\\recap.jpg', transparent=True)
+plt.close()
+##
+fig2, ax2 = plt.subplots()
+for experiment in experiment_parameters.index:
+    if experiment.tau == 60:
+        ax2.plot(experiment.data.theta,\
+                 experiment.data.absorbance/experiment.scale_opt,\
+                 color = colours[int(experiment.stages)],\
+                 label = "%s stages : Bo=%.1f"%(experiment.stages,experiment.Bo_opt))
+ax2.set_xlabel('$\Theta$') #Reduced time absciss
+ax2.set_xlim([0,2.5])
+ax2.set_ylabel('E($\Theta$)')#Adimensional residence time distribution
+plt.legend()
+plt.savefig(dir+'\\tau-60s.jpg', transparent=True)
